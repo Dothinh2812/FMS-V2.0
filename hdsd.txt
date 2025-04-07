@@ -1,0 +1,12 @@
+đồng bộ từ github: 
+git pull origin main
+
+
+////
+đồng bộ từ PC lên github: (sau khi gitclone từ github về):
+
+git add .
+git commit -m "Initial commit of application files"
+git push origin main
+
+my_env\Scripts\activate
