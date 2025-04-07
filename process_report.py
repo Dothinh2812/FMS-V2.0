@@ -14,6 +14,10 @@ def process_report(input_file: str = "fms_data.xlsx", output_file: str = "report
         selected_columns = ['Tên NE', 'Tên gợi nhớ', 'N.Nhân', 'TG Sự cố', 'Tỉnh ghi chú', 'Phân Loại Trạm', 'Quận/Huyện']
         df_report = df[selected_columns].copy()
         
+        # Lọc dữ liệu theo Quận/Huyện
+        filtered_districts = ['Phúc Thọ', 'Sơn Tây', 'Thạch Thất', 'Đan Phượng', 'Ba Vì']
+        df_report = df_report[df_report['Quận/Huyện'].isin(filtered_districts)]
+        
         # Chuyển cột TG Sự cố sang định dạng datetime
         df_report['TG Sự cố'] = pd.to_datetime(df_report['TG Sự cố'], format='%d/%m/%Y %H:%M:%S', errors='coerce')
         
