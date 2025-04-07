@@ -1,0 +1,35 @@
+from playwright.sync_api import Page
+import time
+
+def perform_search(fms: Page) -> bool:
+    """
+    Performs search operations on the FMS page by clicking specific buttons and handling alerts
+    """
+    try:
+        # Wait for page to be fully loaded
+        fms.wait_for_load_state("networkidle")
+        
+        # Click the refresh alerts button
+        search_button = fms.wait_for_selector('//*[@id="btnSearch"]', timeout=10000)
+        if not search_button:
+            print("⚠️ Refresh alerts button not found")
+            return False
+            
+        search_button.click()
+        print("✅ Successfully clicked refresh alerts button")
+        
+        # Wait for data to load using network idle instead of sleep
+        fms.wait_for_load_state("networkidle", timeout=10000)
+        print("✅ Data loading completed")
+        
+        # Check if any error messages or alerts appear
+        error_message = fms.query_selector('.error-message')
+        if error_message:
+            print(f"⚠️ Error message detected: {error_message.text_content()}")
+            return False
+            
+        return True
+        
+    except Exception as e:
+        print(f"❌ Error during search operation: {e}")
+        return False

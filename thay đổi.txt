@@ -1,0 +1,3 @@
+sửa lại hàm zalo để gửi theo tình trạng phiếu tồn, giống như tele
+check định kỳ báo cáo fms 10 phút/lần
+gửi file báo cáo qua tele 10p/lần
