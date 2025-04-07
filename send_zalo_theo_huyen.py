@@ -67,10 +67,10 @@ def send_zalo_theo_huyen(page: Page) -> bool:
         search_input = page.locator('input#contact-search-input')
         search_input.click()
         search_input.fill("")
-        search_input.fill("TEST-ZALO-AUTO")
-        time.sleep(2)
+        search_input.fill("BTS_TTVT8")
+        time.sleep(3)
         search_input.press("Enter")
-        time.sleep(2)
+        time.sleep(3)
 
         # Prepare log data
         log_data = []
