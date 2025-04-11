@@ -35,10 +35,10 @@ def chay_dinh_ky_lap_lai(fms: Page, zalo: Page) -> None:
             print("❌ Report processing failed, skipping remaining steps")
             return
 
-        # Step 4: Send Zalo messages
-        if not send_zalo_theo_huyen(zalo):
-            print("❌ Zalo message sending failed")
-            return
+        # # Step 4: Send Zalo messages
+        # if not send_zalo_theo_huyen(zalo):
+        #     print("❌ Zalo message sending failed")
+        #     return
 
         # Step 5: Send alerts from Excel
         if not send_alerts_from_excel():

@@ -5,7 +5,7 @@ def login2page(p):
     """
     Initialize and login to both FMS and Zalo browsers
     """
-    # Launch the second browser for chat.zalo.me
+    #Launch the second browser for chat.zalo.me
     browser2 = p.chromium.launch(headless=False)
     context2 = browser2.new_context()
     zalo = context2.new_page()
@@ -26,7 +26,7 @@ def login2page(p):
         
         # Fill login credentials
         fms.fill("input[name='username']", "thinhdx.hni")  # Replace with actual username
-        fms.fill("input[name='password']", "T#g6542u")  # Replace with actual password
+        fms.fill("input[name='password']", "A@y44v3m")  # Replace with actual password
         fms.click("button[type='submit']")
         
         print("✅ Login credentials submitted. Waiting for OTP input...")

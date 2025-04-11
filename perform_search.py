@@ -27,9 +27,17 @@ def perform_search(fms: Page) -> bool:
         if error_message:
             print(f"⚠️ Error message detected: {error_message.text_content()}")
             return False
-            
-        return True
+        time.sleep(5)    
+        # Take screenshot after clicking search button
+        timestamp = time.strftime("%Y%m%d-%H%M%S")
+        screenshot_path = f"Screenshot_fms/search_result_{timestamp}.png"
+        fms.screenshot(path=screenshot_path)
+        print(f"✅ Screenshot saved to {screenshot_path}")
         
+        return True
+    
+
+
     except Exception as e:
         print(f"❌ Error during search operation: {e}")
         return False

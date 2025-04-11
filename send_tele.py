@@ -307,6 +307,61 @@ def send_file_report_summary(file_path: str = "report_summary.xlsx") -> bool:
         print(f"❌ Lỗi khi gửi file: {str(e)}")
         return False
 
+def send_latest_screenshot() -> bool:
+    """
+    Send the most recent screenshot from Screenshot_fms folder to Telegram
+    
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    try:
+        # Get the Screenshot_fms directory path
+        screenshot_dir = "Screenshot_fms"
+        
+        # Check if directory exists
+        if not os.path.exists(screenshot_dir):
+            print(f"❌ Directory not found: {screenshot_dir}")
+            return False
+            
+        # Get list of PNG files in directory
+        screenshots = glob.glob(os.path.join(screenshot_dir, "*.png"))
+        
+        if not screenshots:
+            print("❌ No screenshots found")
+            return False
+            
+        # Get most recent screenshot by modification time
+        latest_screenshot = max(screenshots, key=os.path.getmtime)
+        
+        # Send the screenshot
+        url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendPhoto"
+        
+        files = {
+            'photo': open(latest_screenshot, 'rb')
+        }
+        
+        data = {
+            "chat_id": TELEGRAM_CHAT_ID,
+            "caption": "📸 Latest FMS Screenshot"
+        }
+        
+        response = requests.post(url, data=data, files=files)
+        
+        if response.status_code == 200:
+            print(f"✅ Successfully sent screenshot: {latest_screenshot}")
+            return True
+        else:
+            print(f"❌ Failed to send screenshot: {response.text}")
+            return False
+            
+    except Exception as e:
+        print(f"❌ Error sending screenshot: {str(e)}")
+        return False
+    finally:
+        if 'photo' in files:
+            files['photo'].close()
+
 if __name__ == "__main__":
     send_alerts_from_excel()
     send_file_report_summary()
+    send_latest_screenshot()
