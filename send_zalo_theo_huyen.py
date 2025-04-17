@@ -63,108 +63,142 @@ def send_zalo_theo_huyen(page: Page) -> bool:
             page.wait_for_url("**/chat.zalo.me/**", timeout=300000)
             print("✅ Successfully logged into Zalo")
         
-        # Search for group chat
-        search_input = page.locator('input#contact-search-input')
-        search_input.click()
-        search_input.fill("")
-        search_input.fill("BTS_TTVT8")
-        time.sleep(3)
-        search_input.press("Enter")
-        time.sleep(3)
-
+        # Group alerts by district
+        district_groups = {}
+        for index, row in df_filtered.iterrows():
+            district = row.get('Quận/Huyện', 'Unknown')
+            if district not in district_groups:
+                district_groups[district] = []
+            district_groups[district].append(row)
+        
         # Prepare log data
         log_data = []
         alerts_sent = 0
         
-        # Process each filtered record
-        for index, row in df_filtered.iterrows():
+        # Process alerts by district
+        for district, rows in district_groups.items():
             try:
-                # Check for duplicates based on alert type
-                time_threshold = pd.Timedelta(minutes=30 if 'AC' in str(row['N.Nhân']).upper() else 20)
+                # Determine which group to send to based on district
+                group_name = "TEST-ZALO-AUTO"  # Default group
                 
-                if not existing_log.empty:
-                    # Get all matching records
-                    matching_records = existing_log[
-                        (existing_log['Tên NE'] == row['Tên NE']) &
-                        (existing_log['Nội dung cảnh báo'] == row['N.Nhân'])
-                    ]
-                    
-                    if not matching_records.empty:
-                        # Get the most recent record
-                        most_recent = matching_records['Thời gian gửi'].max()
-                        time_since_last = current_time - most_recent
+                if district == "Ba Vì":
+                    group_name = "GS vận hành MFĐ BVI-KTĐH"
+                elif district == "Phúc Thọ":
+                    group_name = "GS vận hành MFĐ PTO-KTĐH"
+                elif district == "Thạch Thất":
+                    group_name = "GS vận hành MFĐ-BTS -TTT-KTĐH"
+                elif district == "Đan Phượng":
+                    group_name = "GS vận hành MFĐ ĐPG-KTĐH"
+                elif district == "Sơn Tây":
+                    group_name = "GS vận hành MFĐ STY-KTĐH"
+                
+                print(f"🔍 Searching for group: {group_name} for district: {district}")
+                
+                # Search for the specific group
+                search_input = page.locator('input#contact-search-input')
+                search_input.click()
+                search_input.fill("")
+                search_input.fill(group_name)
+                time.sleep(3)
+                search_input.press("Enter")
+                time.sleep(3)
+                
+                # Process each alert for this district
+                for row in rows:
+                    try:
+                        # Check for duplicates based on alert type
+                        time_threshold = pd.Timedelta(minutes=30 if 'AC' in str(row['N.Nhân']).upper() else 20)
                         
-                        # Check if within threshold
-                        if time_since_last < time_threshold:
-                            print(f"⏭️ Skipping duplicate alert for {row['Tên NE']} (Last sent: {most_recent.strftime('%Y-%m-%d %H:%M:%S')})")
-                            continue
+                        if not existing_log.empty:
+                            # Get all matching records
+                            matching_records = existing_log[
+                                (existing_log['Tên NE'] == row['Tên NE']) &
+                                (existing_log['Nội dung cảnh báo'] == row['N.Nhân'])
+                            ]
+                            
+                            if not matching_records.empty:
+                                # Get the most recent record
+                                most_recent = matching_records['Thời gian gửi'].max()
+                                time_since_last = current_time - most_recent
+                                
+                                # Check if within threshold
+                                if time_since_last < time_threshold:
+                                    print(f"⏭️ Skipping duplicate alert for {row['Tên NE']} (Last sent: {most_recent.strftime('%Y-%m-%d %H:%M:%S')})")
+                                    continue
 
-                # Prepare message header based on district
-                header = "🔴 Cảnh báo sự cố kéo dài"
-                if pd.notna(row['Quận/Huyện']):
-                    if row['Quận/Huyện'] == "Ba Vì":
-                        header = "🔴 Cảnh báo sự cố kéo dài Ba Vì @0914383384"
-                    elif row['Quận/Huyện'] == "Phúc Thọ":
-                        header = "🔴 Cảnh báo sự cố kéo dài Phúc Thọ @0919519218"
-                    elif row['Quận/Huyện'] == "Sơn Tây":
-                        header = "🔴 Cảnh báo sự cố kéo dài Sơn Tây @0917680203"
-                    elif row['Quận/Huyện'] == "Thạch Thất":
-                        header = "🔴 Cảnh báo sự cố kéo dài Thạch Thất @0945748188"
-                    elif row['Quận/Huyện'] == "Đan Phượng":
-                        header = "🔴 Cảnh báo sự cố kéo dài Đan Phượng @0945548859"
-                
-                # Format duration
-                duration = row.get('Kéo dài', 0)
-                if isinstance(duration, (int, float)):
-                    duration_str = f"{duration:.2f}"
-                else:
-                    duration_str = str(duration)
-                
-                # Prepare message
-                message = (
-                    f"{header}\n"
-                    f"{row.get('Tên NE', 'N/A')}/{row.get('Tên gợi nhớ', 'N/A')}\n"
-                    f"Cảnh báo: {row.get('N.Nhân', 'N/A')}\n"
-                    f"Bắt đầu: {row.get('TG Sự cố', 'N/A')}\n"
-                    f"Kéo dài: {duration_str} giờ\n"
-                    f"{row.get('Phân Loại Trạm', 'N/A')}\n"
-                    f"Ghi chú: {row.get('Tỉnh ghi chú', 'N/A')}"
-                )
-                
-                # Find message input and send message
-                message_input = page.locator('div#input_line_0')
-                message_input.fill(message)
-                time.sleep(2)
-                
-                # Click send button
-                send_button = page.locator('//*[@id="chat-input-container-id"]/div[2]/div[2]/div[2]/i')
-                send_button.click()
-                
-                send_time = datetime.now()
-                alerts_sent += 1
+                        # Prepare message header based on district
+                        header = "🔴 Cảnh báo sự cố kéo dài"
+                        if pd.notna(row['Quận/Huyện']):
+                            if row['Quận/Huyện'] == "Ba Vì":
+                                header = "🔴 Cảnh báo sự cố kéo dài Ba Vì @0914383384"
+                            elif row['Quận/Huyện'] == "Phúc Thọ":
+                                header = "🔴 Cảnh báo sự cố kéo dài Phúc Thọ @0919519218"
+                            elif row['Quận/Huyện'] == "Sơn Tây":
+                                header = "🔴 Cảnh báo sự cố kéo dài Sơn Tây @0917680203"
+                            elif row['Quận/Huyện'] == "Thạch Thất":
+                                header = "🔴 Cảnh báo sự cố kéo dài Thạch Thất @0945748188"
+                            elif row['Quận/Huyện'] == "Đan Phượng":
+                                header = "🔴 Cảnh báo sự cố kéo dài Đan Phượng @0945548859"
+                        
+                        # Format duration
+                        duration = row.get('Kéo dài', 0)
+                        if isinstance(duration, (int, float)):
+                            duration_str = f"{duration:.2f}"
+                        else:
+                            duration_str = str(duration)
+                        
+                        # Prepare message
+                        message = (
+                            f"{header}\n"
+                            f"{row.get('Tên NE', 'N/A')}/{row.get('Tên gợi nhớ', 'N/A')}\n"
+                            f"Cảnh báo: {row.get('N.Nhân', 'N/A')}\n"
+                            f"Bắt đầu: {row.get('TG Sự cố', 'N/A')}\n"
+                            f"Kéo dài: {duration_str} giờ\n"
+                            f"{row.get('Phân Loại Trạm', 'N/A')}\n"
+                            f"Ghi chú: {row.get('Tỉnh ghi chú', 'N/A')}"
+                        )
+                        
+                        # Find message input and send message
+                        message_input = page.locator('div#input_line_0')
+                        message_input.fill(message)
+                        time.sleep(2)
+                        
+                        # Click send button
+                        send_button = page.locator('//*[@id="chat-input-container-id"]/div[2]/div[2]/div[2]/i')
+                        send_button.click()
+                        
+                        send_time = datetime.now()
+                        alerts_sent += 1
 
-                # Log the sent message
-                log_entry = {
-                    'Thời gian gửi': send_time,
-                    'Tên NE': row['Tên NE'],
-                    'Nội dung cảnh báo': row['N.Nhân'],
-                    'Trạng thái': 'Thành công'
-                }
-                log_data.append(log_entry)
-                
-                time.sleep(2)
-                print(f"✅ Sent message {alerts_sent}/{total_alerts}")
+                        # Log the sent message
+                        log_entry = {
+                            'Thời gian gửi': send_time,
+                            'Tên NE': row['Tên NE'],
+                            'Nội dung cảnh báo': row['N.Nhân'],
+                            'Trạng thái': 'Thành công',
+                            'Quận/Huyện': district,
+                            'Nhóm Zalo': group_name
+                        }
+                        log_data.append(log_entry)
+                        
+                        time.sleep(2)
+                        print(f"✅ Sent message {alerts_sent}/{total_alerts} to group {group_name}")
+                        
+                    except Exception as e:
+                        print(f"❌ Error processing record for {district}: {str(e)}")
+                        # Log failed message
+                        log_entry = {
+                            'Thời gian gửi': datetime.now(),
+                            'Tên NE': row['Tên NE'],
+                            'Nội dung cảnh báo': row['N.Nhân'],
+                            'Trạng thái': 'Thất bại',
+                            'Quận/Huyện': district,
+                            'Nhóm Zalo': group_name
+                        }
+                        log_data.append(log_entry)
                 
             except Exception as e:
-                print(f"❌ Error processing record {alerts_sent + 1}: {str(e)}")
-                # Log failed message
-                log_entry = {
-                    'Thời gian gửi': datetime.now(),
-                    'Tên NE': row['Tên NE'],
-                    'Nội dung cảnh báo': row['N.Nhân'],
-                    'Trạng thái': 'Thất bại'
-                }
-                log_data.append(log_entry)
+                print(f"❌ Error processing district {district}: {str(e)}")
 
         # Save log to Excel
         if log_data:

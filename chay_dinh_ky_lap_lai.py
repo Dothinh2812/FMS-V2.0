@@ -5,7 +5,7 @@ from perform_search import perform_search
 from extract_slickgrid_data import extract_slickgrid_data
 from process_report import process_report
 from send_zalo_theo_huyen import send_zalo_theo_huyen
-from send_tele import send_alerts_from_excel, send_file_report_summary
+from send_tele import send_alerts_from_excel, send_file_report_summary, send_latest_screenshot
 
 def chay_dinh_ky_lap_lai(fms: Page, zalo: Page) -> None:
     """
@@ -35,20 +35,25 @@ def chay_dinh_ky_lap_lai(fms: Page, zalo: Page) -> None:
             print("❌ Report processing failed, skipping remaining steps")
             return
 
-        # # Step 4: Send Zalo messages
-        # if not send_zalo_theo_huyen(zalo):
-        #     print("❌ Zalo message sending failed")
-        #     return
+        # Step 4: Send Zalo messages
+        success_zalo = send_zalo_theo_huyen(zalo)
+        if not success_zalo:
+            print("❌ Zalo message sending failed, continuing with next step")
 
         # Step 5: Send alerts from Excel
-        if not send_alerts_from_excel():
-            print("❌ Sending alerts from Excel failed")
-            return
+        success_alerts = send_alerts_from_excel()
+        if not success_alerts:
+            print("❌ Sending alerts from Excel failed, continuing with next step")
 
         # Step 6: Send report summary file
-        if not send_file_report_summary():
-            print("❌ Sending report summary file failed")
-            return
+        success_report = send_file_report_summary()
+        if not success_report:
+            print("❌ Sending report summary file failed, continuing with next step")
+
+        # Step 7: Send latest screenshot
+        success_screenshot = send_latest_screenshot()
+        if not success_screenshot:
+            print("❌ Sending latest screenshot failed, continuing with next step")
 
         print("✅ Periodic execution completed successfully")
         print("=== End of periodic execution ===\n")

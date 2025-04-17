@@ -315,8 +315,9 @@ def send_latest_screenshot() -> bool:
         bool: True if successful, False otherwise
     """
     try:
-        # Get the Screenshot_fms directory path
-        screenshot_dir = "Screenshot_fms"
+        # Get absolute path to Screenshot_fms directory
+        screenshot_dir = os.path.join(os.path.dirname(__file__), "Screenshot_fms")
+        print(f"Looking for screenshots in: {screenshot_dir}")
         
         # Check if directory exists
         if not os.path.exists(screenshot_dir):
@@ -332,27 +333,35 @@ def send_latest_screenshot() -> bool:
             
         # Get most recent screenshot by modification time
         latest_screenshot = max(screenshots, key=os.path.getmtime)
+        print(f"Found latest screenshot: {latest_screenshot}")
         
+        # Verify file is readable
+        if not os.access(latest_screenshot, os.R_OK):
+            print(f"❌ Cannot read file: {latest_screenshot}")
+            return False
+            
         # Send the screenshot
         url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendPhoto"
         
-        files = {
-            'photo': open(latest_screenshot, 'rb')
-        }
-        
-        data = {
-            "chat_id": TELEGRAM_CHAT_ID,
-            "caption": "📸 Latest FMS Screenshot"
-        }
-        
-        response = requests.post(url, data=data, files=files)
-        
-        if response.status_code == 200:
-            print(f"✅ Successfully sent screenshot: {latest_screenshot}")
-            return True
-        else:
-            print(f"❌ Failed to send screenshot: {response.text}")
-            return False
+        with open(latest_screenshot, 'rb') as photo_file:
+            files = {
+                'photo': photo_file
+            }
+            
+            data = {
+                "chat_id": TELEGRAM_CHAT_ID,
+                "caption": f"📸 Latest FMS Screenshot ({datetime.now().strftime('%Y-%m-%d %H:%M:%S')})"
+            }
+            
+            response = requests.post(url, data=data, files=files)
+            
+            if response.status_code == 200:
+                print(f"✅ Successfully sent screenshot: {latest_screenshot}")
+                return True
+            else:
+                print(f"❌ Failed to send screenshot. Status code: {response.status_code}")
+                print(f"Response: {response.text}")
+                return False
             
     except Exception as e:
         print(f"❌ Error sending screenshot: {str(e)}")
