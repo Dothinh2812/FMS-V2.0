@@ -132,30 +132,30 @@ def select_search_criteria(page: Page) -> bool:
         page.fill('//*[@id="tblBox"]/div/div[1]/div/div[3]/span/div/ul/li[1]/div/input', '')
         time.sleep(1)  # Chờ 1 giây sau khi xóa trắng form
 
-        # Tìm và điền giá trị "TG CLR" vào ô tìm kiếm
-        page.wait_for_selector('//*[@id="tblBox"]/div/div[1]/div/div[3]/span/div/ul/li[1]/div/input')
-        page.fill('//*[@id="tblBox"]/div/div[1]/div/div[3]/span/div/ul/li[1]/div/input', 'TG CLR')
-        time.sleep(1)  # Chờ 1 giây sau khi điền giá trị
+        # # Tìm và điền giá trị "TG CLR" vào ô tìm kiếm
+        # page.wait_for_selector('//*[@id="tblBox"]/div/div[1]/div/div[3]/span/div/ul/li[1]/div/input')
+        # page.fill('//*[@id="tblBox"]/div/div[1]/div/div[3]/span/div/ul/li[1]/div/input', 'TG CLR')
+        # time.sleep(1)  # Chờ 1 giây sau khi điền giá trị
 
-        # Chọn tickbox cho "TG CLR"
-        page.wait_for_selector('//*[@id="tblBox"]/div/div[1]/div/div[3]/span/div/ul/li[15]/a/label/input', timeout=10000)
-        page.click('//*[@id="tblBox"]/div/div[1]/div/div[3]/span/div/ul/li[15]/a/label/input')
-        time.sleep(1)  # Chờ 1 giây sau khi chọn tickbox
+        # # Chọn tickbox cho "TG CLR"
+        # page.wait_for_selector('//*[@id="tblBox"]/div/div[1]/div/div[3]/span/div/ul/li[15]/a/label/input', timeout=10000)
+        # page.click('//*[@id="tblBox"]/div/div[1]/div/div[3]/span/div/ul/li[15]/a/label/input')
+        # time.sleep(1)  # Chờ 1 giây sau khi chọn tickbox
 
-        # Xóa trắng ô tìm kiếm
-        page.wait_for_selector('//*[@id="tblBox"]/div/div[1]/div/div[3]/span/div/ul/li[1]/div/input')
-        page.fill('//*[@id="tblBox"]/div/div[1]/div/div[3]/span/div/ul/li[1]/div/input', '')
-        time.sleep(1)  # Chờ 1 giây sau khi xóa trắng form
+        # # Xóa trắng ô tìm kiếm
+        # page.wait_for_selector('//*[@id="tblBox"]/div/div[1]/div/div[3]/span/div/ul/li[1]/div/input')
+        # page.fill('//*[@id="tblBox"]/div/div[1]/div/div[3]/span/div/ul/li[1]/div/input', '')
+        # time.sleep(1)  # Chờ 1 giây sau khi xóa trắng form
 
-        # Tìm và điền giá trị "TG C.Báo" vào ô tìm kiếm
-        page.wait_for_selector('//*[@id="tblBox"]/div/div[1]/div/div[3]/span/div/ul/li[1]/div/input')
-        page.fill('//*[@id="tblBox"]/div/div[1]/div/div[3]/span/div/ul/li[1]/div/input', 'TG C.Báo')
-        time.sleep(1)  # Chờ 1 giây sau khi điền giá trị
+        # # Tìm và điền giá trị "TG C.Báo" vào ô tìm kiếm
+        # page.wait_for_selector('//*[@id="tblBox"]/div/div[1]/div/div[3]/span/div/ul/li[1]/div/input')
+        # page.fill('//*[@id="tblBox"]/div/div[1]/div/div[3]/span/div/ul/li[1]/div/input', 'TG C.Báo')
+        # time.sleep(1)  # Chờ 1 giây sau khi điền giá trị
 
-        # Chọn tickbox cho "TG C.Báo"
-        page.wait_for_selector('//*[@id="tblBox"]/div/div[1]/div/div[3]/span/div/ul/li[16]/a/label/input', timeout=10000)
-        page.click('//*[@id="tblBox"]/div/div[1]/div/div[3]/span/div/ul/li[16]/a/label/input')
-        time.sleep(1)  # Chờ 1 giây sau khi chọn tickbox
+        # # Chọn tickbox cho "TG C.Báo"
+        # page.wait_for_selector('//*[@id="tblBox"]/div/div[1]/div/div[3]/span/div/ul/li[16]/a/label/input', timeout=10000)
+        # page.click('//*[@id="tblBox"]/div/div[1]/div/div[3]/span/div/ul/li[16]/a/label/input')
+        # time.sleep(1)  # Chờ 1 giây sau khi chọn tickbox
 
         # Xóa trắng ô tìm kiếm
         page.wait_for_selector('//*[@id="tblBox"]/div/div[1]/div/div[3]/span/div/ul/li[1]/div/input')

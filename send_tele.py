@@ -6,8 +6,10 @@ import pandas as pd
 from datetime import datetime
 
 # Telegram credentials
-TELEGRAM_TOKEN = "7810323512:AAEL6hDjjZgz64gADrJfcKwrqO42himl3oI"
-TELEGRAM_CHAT_ID = "-4795321025" # TEST
+#TELEGRAM_TOKEN = "7810323512:AAEL6hDjjZgz64gADrJfcKwrqO42himl3oI" #@baocaott8bot
+TELEGRAM_TOKEN = "7785723852:AAFZCei8UveSC2brM01JmW76LQMkd_2nJcU" #@bts_tt8_bot
+#TELEGRAM_CHAT_ID = "-4795321025" # TEST
+TELEGRAM_CHAT_ID = "-4616062001" # TEST
 TELEGRAM_CHAT_ID_ALL = "-4709942351" # id nhóm nhận file báo cáo toàn bộ chi tiết    
 
 #TELEGRAM_CHAT_ID = "-4616062001" # CHÍNH THỨC
@@ -185,7 +187,7 @@ def send_alerts_from_excel(excel_file: str = "report_summary.xlsx") -> bool:
         # Filter alerts based on conditions
         df_filtered = df[
             ((df['N.Nhân'].str.contains('OOS', case=False, na=False)) |
-             (df['N.Nhân'].str.contains('AC', case=False, na=False) & (df['Kéo dài'] > 0.5))) &
+             (df['N.Nhân'].str.contains('AC', case=False, na=False))) &
             (df['Phân Loại Trạm'] != 'Trạm viễn thông loại 3')
         ]
 
@@ -229,11 +231,11 @@ def send_alerts_from_excel(excel_file: str = "report_summary.xlsx") -> bool:
                         print(f"⏭️ Bỏ qua cảnh báo trùng lặp cho {row['Tên NE']} (Lần gửi gần nhất: {most_recent.strftime('%Y-%m-%d %H:%M:%S')})")
                         continue
             message = (
-                f"🔴 <b>{'Cảnh báo MLL trạm' if 'OOS' in str(row['N.Nhân']).upper() else 'Cảnh báo mất AC'}</b>\n"
-                f"{row['Tên NE']}/{row['Tên gợi nhớ']}\n"
+                f" <b>{'🔴🔴🗼Cảnh báo MLL trạm' if 'OOS' in str(row['N.Nhân']).upper() else '⚡⚡⚡ Cảnh báo mất AC'}</b>\n"
+                f"{row['<b>Tên NE</b>']}/{row['Tên gợi nhớ']}\n"
                 f"Cảnh báo: {row['N.Nhân']}\n" 
                 f"Bắt đầu: {row['TG Sự cố']}\n"
-                f"Kéo dài: {row['Kéo dài']:.2f} giờ\n"
+                f"<b>Kéo dài: {row['Kéo dài']:.2f} giờ</b>\n"
                 f"{row['Phân Loại Trạm']}\n"
                 f"Ghi chú: {row['Tỉnh ghi chú']}"
             )

@@ -3,6 +3,7 @@ import pandas as pd
 import time
 import os
 from datetime import datetime
+from login2page import login2page
 
 def send_zalo_theo_huyen(page: Page) -> bool:
     """
@@ -34,9 +35,14 @@ def send_zalo_theo_huyen(page: Page) -> bool:
             return False
 
         # Filter alerts based on conditions
+        # df_filtered = df[
+        #     ((df['N.Nhân'].str.contains('OOS', case=False, na=False)) |
+        #      (df['N.Nhân'].str.contains('AC', case=False, na=False) & (df['Kéo dài'] > 0.5))) &
+        #     (df['Phân Loại Trạm'] != 'Trạm viễn thông loại 3')
+        # ]
         df_filtered = df[
             ((df['N.Nhân'].str.contains('OOS', case=False, na=False)) |
-             (df['N.Nhân'].str.contains('AC', case=False, na=False) & (df['Kéo dài'] > 0.5))) &
+             (df['N.Nhân'].str.contains('AC', case=False, na=False))) &
             (df['Phân Loại Trạm'] != 'Trạm viễn thông loại 3')
         ]
 
@@ -126,19 +132,24 @@ def send_zalo_theo_huyen(page: Page) -> bool:
                                     print(f"⏭️ Skipping duplicate alert for {row['Tên NE']} (Last sent: {most_recent.strftime('%Y-%m-%d %H:%M:%S')})")
                                     continue
 
-                        # Prepare message header based on district
-                        header = "🔴 Cảnh báo sự cố kéo dài"
-                        if pd.notna(row['Quận/Huyện']):
-                            if row['Quận/Huyện'] == "Ba Vì":
-                                header = "🔴 Cảnh báo sự cố kéo dài Ba Vì @0914383384"
-                            elif row['Quận/Huyện'] == "Phúc Thọ":
-                                header = "🔴 Cảnh báo sự cố kéo dài Phúc Thọ @0919519218"
-                            elif row['Quận/Huyện'] == "Sơn Tây":
-                                header = "🔴 Cảnh báo sự cố kéo dài Sơn Tây @0917680203"
-                            elif row['Quận/Huyện'] == "Thạch Thất":
-                                header = "🔴 Cảnh báo sự cố kéo dài Thạch Thất @0945748188"
-                            elif row['Quận/Huyện'] == "Đan Phượng":
-                                header = "🔴 Cảnh báo sự cố kéo dài Đan Phượng @0945548859"
+                        # Prepare message header based on alert type
+                        if 'OOS' in str(row['N.Nhân']).upper():
+                            header = "🔴🔴Cảnh báo MLL trạm 🗼"
+                        elif 'AC' in str(row['N.Nhân']).upper():
+                            header = "⚡⚡⚡Cảnh báo mất AC 🔋"
+                        # else:
+                        #     header = "🔴 Cảnh báo sự cố kéo dài"
+                        # if pd.notna(row['Quận/Huyện']):
+                        #     if row['Quận/Huyện'] == "Ba Vì":
+                        #         header = "🔴 Cảnh báo sự cố Ba Vì"
+                        #     elif row['Quận/Huyện'] == "Phúc Thọ":
+                        #         header = "🔴 Cảnh báo sự cố  Phúc Thọ"
+                        #     elif row['Quận/Huyện'] == "Sơn Tây":
+                        #         header = "🔴 Cảnh báo sự cố Sơn Tây"
+                        #     elif row['Quận/Huyện'] == "Thạch Thất":
+                        #         header = "🔴 Cảnh báo sự cố Thạch Thất"
+                        #     elif row['Quận/Huyện'] == "Đan Phượng":
+                        #         header = "🔴 Cảnh báo sự cố Đan Phượng"
                         
                         # Format duration
                         duration = row.get('Kéo dài', 0)
@@ -214,3 +225,6 @@ def send_zalo_theo_huyen(page: Page) -> bool:
     except Exception as e:
         print(f"❌ Error in send_zalo_theo_huyen: {str(e)}")
         return False
+if __name__ == "__main__":
+    login2page(p)
+    send_zalo_theo_huyen(page)
