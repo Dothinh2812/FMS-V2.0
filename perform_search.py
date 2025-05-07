@@ -27,16 +27,27 @@ def perform_search(fms: Page) -> bool:
         if error_message:
             print(f"⚠️ Error message detected: {error_message.text_content()}")
             return False
-        time.sleep(5)    
-        # Take screenshot after clicking search button
-        timestamp = time.strftime("%Y%m%d-%H%M%S")
-        screenshot_path = f"Screenshot_fms/search_result_{timestamp}.png"
-        fms.screenshot(path=screenshot_path)
-        print(f"✅ Screenshot saved to {screenshot_path}")
+            
+        # Thêm thời gian chờ để đảm bảo trang đã load hoàn toàn
+        time.sleep(10)
         
+        try:
+            # Take screenshot with increased timeout and specific options
+            timestamp = time.strftime("%Y%m%d-%H%M%S")
+            screenshot_path = f"Screenshot_fms/search_result_{timestamp}.png"
+            fms.screenshot(
+                path=screenshot_path,
+                timeout=60000,  # Tăng timeout lên 60 giây
+                type='jpeg',    # Sử dụng định dạng JPEG thay vì PNG
+                quality=80,     # Giảm chất lượng ảnh để tăng tốc độ
+                animations='disabled'  # Tắt animations
+            )
+            print(f"✅ Screenshot saved to {screenshot_path}")
+        except Exception as screenshot_error:
+            print(f"⚠️ Screenshot failed but continuing execution: {screenshot_error}")
+            # Tiếp tục thực thi ngay cả khi screenshot thất bại
+            
         return True
-    
-
 
     except Exception as e:
         print(f"❌ Error during search operation: {e}")
