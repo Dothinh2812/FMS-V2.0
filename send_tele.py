@@ -232,10 +232,10 @@ def send_alerts_from_excel(excel_file: str = "report_summary.xlsx") -> bool:
                         continue
             message = (
                 f" <b>{'🔴🔴🗼Cảnh báo MLL trạm' if 'OOS' in str(row['N.Nhân']).upper() else '⚡⚡⚡ Cảnh báo mất AC'}</b>\n"
-                f"{row['<b>Tên NE</b>']}/{row['Tên gợi nhớ']}\n"
+                f"<b>{row['Tên NE']}</b>/{row['Tên gợi nhớ']}\n"
                 f"Cảnh báo: {row['N.Nhân']}\n" 
                 f"Bắt đầu: {row['TG Sự cố']}\n"
-                f"<b>Kéo dài: {row['Kéo dài']:.2f} giờ</b>\n"
+                f"<b>Kéo dài: {row['Kéo dài']*60:.0f} phút</b>\n"
                 f"{row['Phân Loại Trạm']}\n"
                 f"Ghi chú: {row['Tỉnh ghi chú']}"
             )

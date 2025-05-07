@@ -154,9 +154,16 @@ def send_zalo_theo_huyen(page: Page) -> bool:
                         # Format duration
                         duration = row.get('Kéo dài', 0)
                         if isinstance(duration, (int, float)):
-                            duration_str = f"{duration:.2f}"
+                            # Convert hours to minutes and format with 2 decimal places
+                            duration_minutes = duration * 60
+                            duration_str = f"{duration_minutes:.2f}"
                         else:
-                            duration_str = str(duration)
+                            # Try to convert string to float, multiply by 60, then format
+                            try:
+                                duration_minutes = float(duration) * 60
+                                duration_str = f"{duration_minutes:.2f}"
+                            except (ValueError, TypeError):
+                                duration_str = str(duration)
                         
                         # Prepare message
                         message = (
@@ -164,7 +171,7 @@ def send_zalo_theo_huyen(page: Page) -> bool:
                             f"{row.get('Tên NE', 'N/A')}/{row.get('Tên gợi nhớ', 'N/A')}\n"
                             f"Cảnh báo: {row.get('N.Nhân', 'N/A')}\n"
                             f"Bắt đầu: {row.get('TG Sự cố', 'N/A')}\n"
-                            f"Kéo dài: {duration_str} giờ\n"
+                            f"Kéo dài: ==={duration_str}=== phút\n"
                             f"{row.get('Phân Loại Trạm', 'N/A')}\n"
                             f"Ghi chú: {row.get('Tỉnh ghi chú', 'N/A')}"
                         )
