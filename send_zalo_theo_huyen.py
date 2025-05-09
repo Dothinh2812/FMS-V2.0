@@ -43,7 +43,8 @@ def send_zalo_theo_huyen(page: Page) -> bool:
         df_filtered = df[
             ((df['N.Nhân'].str.contains('OOS', case=False, na=False)) |
              (df['N.Nhân'].str.contains('AC', case=False, na=False))) &
-            (df['Phân Loại Trạm'] != 'Trạm viễn thông loại 3')
+            (df['Phân Loại Trạm'] != 'Trạm viễn thông loại 3') &
+            (~df['Tên NE'].str.contains('STY003', case=False, na=False))
         ]
 
         # Load existing log if exists
